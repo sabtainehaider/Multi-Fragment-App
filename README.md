@@ -1,1 +1,1 @@
-Assignment: Developing a Multi-Fragment App with Shared Preferences
+Assignment 1 & 2
