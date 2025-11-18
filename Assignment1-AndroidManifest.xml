@@ -1,0 +1,114 @@
+package com.example.calculator
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var display: TextView
+    private val calc = Calculator()
+    private var firstValue = 0.0
+    private var secondValue = 0.0
+    private var operator = ""
+    private var isNewOp = true
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        display = findViewById(R.id.tvDisplay)
+
+        val numberButtons = listOf(
+            R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3,
+            R.id.btn4, R.id.btn5, R.id.btn6,
+            R.id.btn7, R.id.btn8, R.id.btn9, R.id.btnDot
+        )
+
+        numberButtons.forEach { id ->
+            findViewById<Button>(id).setOnClickListener { numberClick(it as Button) }
+        }
+
+        val opButtons = listOf(
+            R.id.btnPlus, R.id.btnMinus, R.id.btnMultiply, R.id.btnDivide
+        )
+
+        opButtons.forEach { id ->
+            findViewById<Button>(id).setOnClickListener { operatorClick(it as Button) }
+        }
+
+        findViewById<Button>(R.id.btnEqual).setOnClickListener { equalClick() }
+        findViewById<Button>(R.id.btnAC).setOnClickListener { acClick() }
+
+        // Scientific Functions
+        findViewById<Button>(R.id.btnSin).setOnClickListener { funcClick("sin") }
+        findViewById<Button>(R.id.btnCos).setOnClickListener { funcClick("cos") }
+        findViewById<Button>(R.id.btnTan).setOnClickListener { funcClick("tan") }
+        findViewById<Button>(R.id.btnLog).setOnClickListener { funcClick("log") }
+        findViewById<Button>(R.id.btnLn).setOnClickListener { funcClick("ln") }
+        findViewById<Button>(R.id.btnSqrt).setOnClickListener { funcClick("sqrt") }
+        findViewById<Button>(R.id.btnPow).setOnClickListener { funcClick("pow") }
+        findViewById<Button>(R.id.btnFact).setOnClickListener { funcClick("fact") }
+    }
+
+    private fun numberClick(btn: Button) {
+        if (isNewOp) {
+            display.text = ""
+            isNewOp = false
+        }
+        val text = display.text.toString() + btn.text
+        display.text = text
+    }
+
+    private fun operatorClick(btn: Button) {
+        firstValue = display.text.toString().toDoubleOrNull() ?: 0.0
+        operator = btn.text.toString()
+        isNewOp = true
+    }
+
+    private fun equalClick() {
+        try {
+            secondValue = display.text.toString().toDoubleOrNull() ?: 0.0
+            val result = when (operator) {
+                "+" -> calc.add(firstValue, secondValue)
+                "−" -> calc.subtract(firstValue, secondValue)
+                "×" -> calc.multiply(firstValue, secondValue)
+                "÷" -> calc.divide(firstValue, secondValue)
+                else -> secondValue
+            }
+            display.text = result.toString()
+            isNewOp = true
+        } catch (e: Exception) {
+            display.text = "Error"
+        }
+    }
+
+    private fun acClick() {
+        display.text = "0"
+        firstValue = 0.0
+        secondValue = 0.0
+        operator = ""
+        isNewOp = true
+    }
+
+    private fun funcClick(type: String) {
+        try {
+            val value = display.text.toString().toDoubleOrNull() ?: 0.0
+            val result = when (type) {
+                "sin" -> calc.sin(value)
+                "cos" -> calc.cos(value)
+                "tan" -> calc.tan(value)
+                "log" -> calc.log(value)
+                "ln" -> calc.ln(value)
+                "sqrt" -> calc.sqrt(value)
+                "pow" -> Math.pow(value, 2.0)
+                "fact" -> calc.factorial(value.toInt()).toDouble()
+                else -> value
+            }
+            display.text = result.toString()
+            isNewOp = true
+        } catch (e: Exception) {
+            display.text = "Error"
+        }
+    }
+}
